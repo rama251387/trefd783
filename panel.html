@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Panel SVN</title>
+<style>
+  body { font-family: system-ui, sans-serif; margin: 0; padding: 20px; background: #111; color: #eee; }
+  label { display: block; margin-top: 14px; font-size: 13px; color: #aaa; }
+  input { width: 100%; padding: 10px; font-size: 16px; border-radius: 8px; border: 1px solid #333; background: #1c1c1c; color: #fff; }
+  button { margin-top: 22px; width: 100%; padding: 14px; font-size: 16px; border: 0; border-radius: 8px; background: #2f7d32; color: #fff; }
+  #estado { margin-top: 14px; font-size: 13px; color: #8f8; min-height: 20px; }
+</style>
+
+<label>Saldo disponible</label>
+<input data-et="Saldo disponible" type="number" value="1000000">
+
+<label>Saldo total</label>
+<input data-et="Saldo total" type="number" value="2000000">
+
+<label>Inicio día</label>
+<input data-et="Inicio día" type="number" value="3000000">
+
+<label>Tiempo real</label>
+<input data-et="Tiempo real" type="number" value="4000000">
+
+<label>Cuentas depósito</label>
+<input data-et="Cuentas depósito" type="number" value="5000000">
+
+<label>Número de cuentas (texto)</label>
+<input id="cuentas" type="text" value="7 Cuentas">
+
+<button onclick="guardar()">Guardar</button>
+<div id="estado"></div>
+
+<script>
+const URL_BLOB = 'https://jsonblob.com/api/jsonBlob/01a1d71a-1a76-717c-8c16-3fe21c81180d';
+
+async function guardar() {
+  const campos = [...document.querySelectorAll('input[data-et]')].map((i) => ({
+    etiqueta: i.dataset.et,
+    valor: Number(i.value),
+    ...(i.dataset.et === 'Cuentas depósito' ? { zona: '[class*="card"]' } : {}),
+  }));
+  campos.push({ etiqueta: 'Número de cuentas', texto: document.getElementById('cuentas').value });
+
+  try {
+    const r = await fetch(URL_BLOB, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ campos }),
+    });
+    document.getElementById('estado').textContent = r.ok ? 'Guardado' : 'Error ' + r.status;
+  } catch (e) {
+    document.getElementById('estado').textContent = 'Error de red';
+  }
+}
+</script>
